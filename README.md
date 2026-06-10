@@ -5,7 +5,7 @@
 > [!Important]
 > Introduzca a continuación su nombre y apellidos:
 >
-> Fulano Mengano Zutano
+> Edgar Milián Marín
 
 ## Aviso Importante
 
@@ -95,12 +95,66 @@ $v_2$, y $v_1^\perp$ es normal (perpendicular) a $v_2$.
 Inserte a continuación una captura de pantalla que muestre el resultado de ejecutar el
 fichero `algebra/vectores.py` con la opción *verbosa*, de manera que se muestre el
 resultado de la ejecución de los tests unitarios.
+![Captura tests unitarios](img/Foto3.png)
 
 #### Código desarrollado
 
 Inserte a continuación el código de los métodos desarrollados en esta tarea, usando los
 comandos necesarios para que se realice el realce sintáctico en Python del mismo (no
 vale insertar una imagen o una captura de pantalla, debe hacerse en formato *markdown*).
+``` python
+    """
+    multiplicación en clase vector
+    """
+
+    def __mul__(self, other):
+        if isinstance(other, (int,float)):
+            return Vector([x * other for x in self])
+
+        if isinstance(other, Vector):
+            if len(self) != len(other): #verificación los dos vectores son igual de largos
+                raise ValueError("Los vectores deben tener la misma longitud")
+            return Vector([x * y for x, y in zip(self, other)])
+
+        return NotImplemented
+    def __rmul__(self, other):
+        return self.__mul__(other)
+    # producto escalar
+    def __matmul__(self, other):
+        if not isinstance(other, Vector):#verificación other es un Vector
+            return NotImplemented
+        
+        if len(self) != len(other):
+            raise ValueError("Los vectores deben tener la misma longitud")
+        
+        return sum(x * y for x, y in zip(self, other))
+
+    # (por simetría)
+    __rmatmul__ = __matmul__
+
+    def __floordiv__(self, other): #operador //
+        if not isinstance(other, Vector): #verificación other es un Vector
+            return NotImplemented
+        if len(self) != len(other): #verificación los dos vectores son igual de largos
+            raise ValueError("Los vectores deben tener la misma longitud")
+
+        denom = other @ other #producto escalar del segundo vector
+        if denom == 0: #si fuera 0, no tendria diracción y no podriamos trabajar
+            raise ValueError("No se puede proyectar sobre el vector nulo")
+
+        factor = (self @ other) / denom  #cálculo producto escalar v1 * v2 / denom qeu es el prdocuto escalar del sugndo vector
+        return factor * other  #obtención vector paralelo a v2
+
+    __rfloordiv__ = __floordiv__ #conmutación(simetria)
+
+    def __mod__(self, other): #operador %
+        if not isinstance(other, Vector): #verificación other es un Vector
+            return NotImplemented
+
+        return self - (self // other) #v1 perpendicular = v1 - v1 paralelo
+
+    __rmod__ = __mod__ #conmutación (simetria)
+```
 
 #### Subida del resultado al repositorio GitHub y *pull-request*
 
